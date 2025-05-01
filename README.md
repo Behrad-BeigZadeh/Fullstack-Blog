@@ -52,6 +52,7 @@ cd ecommerce-fullstack
 2. Install dependencies:
    ```bash
    npm install
+   
  ### Set up environment variables
 -PORT=5000
 -DATABASE_URL=You can add it from neon
@@ -64,6 +65,11 @@ cd ecommerce-fullstack
 -CLOUDINARY_API_SECRET=your_cloudinary_secret
 
 npm run dev
+
+### Seeding Database 
+npx prisma migrate dev --name init
+npm run seed
+
 
 ---
 
