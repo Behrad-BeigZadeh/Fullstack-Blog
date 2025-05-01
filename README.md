@@ -46,34 +46,37 @@ Backend:
 git clone https://github.com/Behrad-BeigZadeh/ecommerce-fullstack.git
 cd ecommerce-fullstack
 
-🔙 Backend Setup
+### 🧰 Backend
 
-cd backend
-npm install
-
-Create a .env file in the backend directory:
-PORT=5000
-DATABASE_URL=You can add it from neon
-ACCESS_TOKEN_SECRET=your_access_token
-REFRESH_TOKEN_SECRET=your_refresh_token
-ARCJET_KEY=your_arcjet_key
-ARCJET_ENV=development | production
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
-CLOUDINARY_API_KEY=your_cloudinary_key
-CLOUDINARY_API_SECRET=your_cloudinary_secret
+1. Go to the `backend/` folder
+2. Install dependencies:
+   ```bash
+   npm install
+ ### Set up environment variables
+-PORT=5000
+-DATABASE_URL=You can add it from neon
+-ACCESS_TOKEN_SECRET=your_access_token
+-REFRESH_TOKEN_SECRET=your_refresh_token
+-ARCJET_KEY=your_arcjet_key
+-ARCJET_ENV=development | production
+-CLOUDINARY_CLOUD_NAME=your_cloudinary_name
+-CLOUDINARY_API_KEY=your_cloudinary_key
+-CLOUDINARY_API_SECRET=your_cloudinary_secret
 
 npm run dev
 
 ---
 
-🖥️ Frontend Setup
+ ### 🧰 Frontend
 
-cd frontend
-npm install
+1. Go to the `frontend/` folder
+2. Install dependencies:
+   ```bash
+   npm install
 
-Create a .env file in the frontend directory:
-NEXT_PUBLIC_API_BASE=http://localhost:5000
-npm run dev
+ ### Set up environment variables
+-NEXT_PUBLIC_API_BASE=http://localhost:5000
+-npm run dev
 
 
 
