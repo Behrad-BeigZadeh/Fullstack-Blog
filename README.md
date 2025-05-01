@@ -1,3 +1,7 @@
+# 📝 Fullstack Blog App
+
+A modern fullstack blog platform built with **Next.js**, **Prisma**, **PostgreSQL**, and **Zustand**, allowing users to create, view, update, delete, like/dislike, and comment on blog posts in real time.
+
 🔐 Authentication with JWT & protected routes
 ✍️ Create / Update / Delete blog posts (with image upload)
 📂 Categories (using enum in Prisma)
