@@ -67,8 +67,9 @@ cd ecommerce-fullstack
 npm run dev
 
 ### Seeding Database 
-npx prisma migrate dev --name init
-npm run seed
+-npx prisma migrate dev --name init
+
+-npm run seed
 
 
 ---
