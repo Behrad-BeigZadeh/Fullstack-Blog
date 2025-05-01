@@ -76,7 +76,8 @@ npm run dev
 
  ### Set up environment variables
 -NEXT_PUBLIC_API_BASE=http://localhost:5000
--npm run dev
+
+npm run dev
 
 
 
