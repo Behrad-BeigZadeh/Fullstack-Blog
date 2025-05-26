@@ -1,3 +1,7 @@
+# 📝 Fullstack Blog App
+
+A modern fullstack blog platform built with **Next.js**, **Prisma**, **PostgreSQL**, and **Zustand**, allowing users to create, view, update, delete, like/dislike, and comment on blog posts in real time.
+
 🔐 Authentication with JWT & protected routes
 ✍️ Create / Update / Delete blog posts (with image upload)
 📂 Categories (using enum in Prisma)
@@ -52,6 +56,7 @@ cd ecommerce-fullstack
 2. Install dependencies:
    ```bash
    npm install
+   
  ### Set up environment variables
 -PORT=5000
 -DATABASE_URL=You can add it from neon
@@ -65,6 +70,12 @@ cd ecommerce-fullstack
 
 npm run dev
 
+### Seeding Database 
+-npx prisma migrate dev --name init
+
+-npm run seed
+
+
 ---
 
  ### 🧰 Frontend
@@ -76,7 +87,8 @@ npm run dev
 
  ### Set up environment variables
 -NEXT_PUBLIC_API_BASE=http://localhost:5000
--npm run dev
+
+npm run dev
 
 
 
