@@ -1,5 +1,6 @@
 import cloudinary from "../lib/cloudinary.js";
 import slugify from "slugify";
+import prisma from "../lib/prisma.js";
 
 export const getPosts = async (req, res) => {
   try {
