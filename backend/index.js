@@ -20,6 +20,9 @@ app.use(
     credentials: true,
   })
 );
+app.get("/ping", (req, res) => {
+  res.status(200).send("pong");
+});
 app.use("/api/posts", postsRouter);
 app.use("/api/auth", usersRouter);
 

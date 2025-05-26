@@ -6,11 +6,9 @@ import { useAuthStore } from "@/stores/useAuthStore";
 import { logoutUser } from "@/apis/api";
 
 export const useRefreshToken = () => {
-  const { setAccessToken, setUser, logout } = useAuthStore();
+  const { setAccessToken, setUser, logout, accessToken } = useAuthStore();
 
   useEffect(() => {
-    let didRunOnce = false;
-
     const refresh = async () => {
       try {
         const { data } = await axios.get(
@@ -28,14 +26,14 @@ export const useRefreshToken = () => {
     };
 
     // Run once on mount
-    if (!didRunOnce) {
+
+    if (!accessToken) {
       refresh();
-      didRunOnce = true;
     }
 
     // Also run every 14 minutes
     const interval = setInterval(refresh, 14 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [setAccessToken, setUser, logout]);
+  }, [setAccessToken, setUser, logout, accessToken]);
 };
