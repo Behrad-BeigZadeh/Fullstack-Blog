@@ -1,7 +1,5 @@
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
-import "@fontsource/sora/400.css";
-import "@fontsource/sora/700.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ClientProviders from "@/components/ClientProviders";
