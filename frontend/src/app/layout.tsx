@@ -2,7 +2,14 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { Sora } from "next/font/google";
 import ClientProviders from "@/components/ClientProviders";
+
+const sora = Sora({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
 
 export const metadata = {
   title: "MyBlog",
@@ -16,7 +23,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="font-sans bg-zinc-100">
+      <body className={`${sora.className} font-sans bg-zinc-100`}>
         <ClientProviders>
           <Navbar />
 
