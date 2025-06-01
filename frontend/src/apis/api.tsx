@@ -1,15 +1,10 @@
-import { getAccessToken, getCurrentUser } from "@/stores/useAuthStore";
-import axios from "axios";
+import api from "@/lib/axios";
+import { getCurrentUser } from "@/stores/useAuthStore";
 
 // Get All posts
 export const getPosts = async () => {
   try {
-    const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts`,
-      {
-        withCredentials: true,
-      }
-    );
+    const { data } = await api.get("/api/posts");
     return data;
   } catch (error) {
     console.log("Error fetching posts", error);
@@ -34,13 +29,9 @@ if (!user) {
 // GEt a single post by id
 export const getPost = async (id: string) => {
   try {
-    const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts/${id}`,
-      {
-        withCredentials: true,
-        headers,
-      }
-    );
+    const { data } = await api.get(`/api/posts/${id}`, {
+      headers,
+    });
     return data;
   } catch (error) {
     console.log("Error fetching post", error);
@@ -51,17 +42,12 @@ export const getPost = async (id: string) => {
 // Create post
 export const createPost = async (formData: FormData) => {
   try {
-    const token = getAccessToken();
-    const { data } = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts`,
-      formData,
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const { data } = await api.post("/api/posts", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
     return data;
   } catch (error) {
     console.log("Error creating post", error);
@@ -72,12 +58,7 @@ export const createPost = async (formData: FormData) => {
 // Get Top posts
 export const getTopPosts = async () => {
   try {
-    const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts/top`,
-      {
-        withCredentials: true,
-      }
-    );
+    const { data } = await api.get("/api/posts/top");
     return data;
   } catch (error) {
     console.log("Error fetching top posts", error);
@@ -91,17 +72,7 @@ export const toggleReaction = async (
   type: "LIKE" | "DISLIKE"
 ) => {
   try {
-    const token = getAccessToken();
-    const { data } = await axios.put(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts/${postId}/reaction`,
-      { type },
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const { data } = await api.put(`/api/posts/${postId}/reaction`, { type });
     return data;
   } catch (error) {
     console.log("Error toggling reaction", error);
@@ -112,17 +83,9 @@ export const toggleReaction = async (
 // Add comment
 export const addComment = async (postId: string, commentText: string) => {
   try {
-    const token = getAccessToken();
-    const { data } = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts/${postId}/comments`,
-      { commentText },
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const { data } = await api.post(`/api/posts/${postId}/comments`, {
+      commentText,
+    });
     return data;
   } catch (error) {
     console.log("Error adding comment", error);
@@ -133,12 +96,7 @@ export const addComment = async (postId: string, commentText: string) => {
 // Get all comments
 export const getComments = async (postId: string) => {
   try {
-    const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts/${postId}/comments`,
-      {
-        withCredentials: true,
-      }
-    );
+    const { data } = await api.get(`/api/posts/${postId}/comments`);
     return data;
   } catch (error) {
     console.log("Error fetching comments", error);
@@ -150,16 +108,7 @@ export const getComments = async (postId: string) => {
 
 export const getUserPosts = async () => {
   try {
-    const token = getAccessToken();
-    const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts/userPosts`,
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const { data } = await api.get("/api/posts/userPosts");
     return data;
   } catch (error) {
     console.log("Error fetching user posts", error);
@@ -170,16 +119,7 @@ export const getUserPosts = async () => {
 // Delete user post
 export const deleteUserPost = async (postId: string) => {
   try {
-    const token = getAccessToken();
-    const { data } = await axios.delete(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts/${postId}`,
-      {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const { data } = await api.delete(`/api/posts/${postId}`);
     return data;
   } catch (error) {
     console.log("Error fetching user posts", error);
@@ -190,14 +130,12 @@ export const deleteUserPost = async (postId: string) => {
 // Update a post
 export const updateUserPost = async (formData: FormData, postId: string) => {
   try {
-    const token = getAccessToken();
-    const { data } = await axios.put(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/posts/${postId}/updatePost`,
+    const { data } = await api.put(
+      `/api/posts/${postId}/updatePost`,
       formData,
       {
-        withCredentials: true,
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
       }
     );
@@ -215,13 +153,11 @@ export const signup = async (
   password: string
 ) => {
   try {
-    const { data } = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/signup`,
-      { username, email, password },
-      {
-        withCredentials: true,
-      }
-    );
+    const { data } = await api.post("/api/auth/signup", {
+      username,
+      email,
+      password,
+    });
     return data;
   } catch (error) {
     console.log("Error signing up", error);
@@ -231,11 +167,7 @@ export const signup = async (
 
 export const login = async (email: string, password: string) => {
   try {
-    const { data } = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/login`,
-      { email, password },
-      { withCredentials: true }
-    );
+    const { data } = await api.post("/api/auth/login", { email, password });
     return data;
   } catch (error) {
     console.log("Error logging in", error);
@@ -245,11 +177,7 @@ export const login = async (email: string, password: string) => {
 
 export const logoutUser = async () => {
   try {
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/logout`,
-      {},
-      { withCredentials: true }
-    );
+    await api.post("/api/auth/logout", {});
   } catch (error) {
     console.log("Error logging out", error);
     throw error;

@@ -1,0 +1,55 @@
+import { logoutUser } from "@/apis/api";
+import { useAuthStore } from "@/stores/useAuthStore";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE,
+  withCredentials: true,
+});
+
+let isRefreshing = false;
+
+api.interceptors.request.use(async (config) => {
+  const { accessToken, setAccessToken, setUser, logout } =
+    useAuthStore.getState();
+
+  if (!accessToken) return config;
+
+  try {
+    const { exp } = jwtDecode<{ exp: number }>(accessToken);
+    const now = Date.now() / 1000;
+
+    if (exp - now < 60 && !isRefreshing) {
+      isRefreshing = true;
+
+      try {
+        const { data } = await axios.post(
+          `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/refresh-token`,
+          {},
+          { withCredentials: true }
+        );
+
+        setAccessToken(data.data.accessToken);
+        setUser(data.data.user);
+        config.headers.Authorization = `Bearer ${data.data.accessToken}`;
+      } catch (err) {
+        console.error("Refresh token failed inside interceptor", err);
+        await logoutUser();
+        logout();
+        throw err;
+      } finally {
+        isRefreshing = false;
+      }
+    } else {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    return config;
+  } catch (err) {
+    console.error("Failed to decode token or refresh", err);
+    return config;
+  }
+});
+
+export default api;
