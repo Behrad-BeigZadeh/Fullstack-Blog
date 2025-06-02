@@ -91,6 +91,7 @@ const NewPosts = () => {
                     fill
                     alt={post.title}
                     className="w-[90%] h-100 object-cover transition-all duration-300 ease-in-out transform "
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 </div>
 

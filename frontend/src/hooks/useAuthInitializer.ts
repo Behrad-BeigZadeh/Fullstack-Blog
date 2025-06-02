@@ -14,8 +14,8 @@ export const useAuthInitializer = () => {
           { withCredentials: true }
         );
 
-        setAccessToken(data.data.accessToken);
-        setUser(data.data.user);
+        setAccessToken(data.accessToken);
+        setUser(data.user);
 
         console.log(" Session restored from refresh token");
       } catch (err) {

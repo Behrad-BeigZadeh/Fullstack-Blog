@@ -30,8 +30,8 @@ api.interceptors.request.use(async (config) => {
           { withCredentials: true }
         );
 
-        setAccessToken(data.data.accessToken);
-        setUser(data.data.user);
+        setAccessToken(data.accessToken);
+        setUser(data.user);
         config.headers.Authorization = `Bearer ${data.data.accessToken}`;
       } catch (err) {
         console.error("Refresh token failed inside interceptor", err);

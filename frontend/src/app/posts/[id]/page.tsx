@@ -68,7 +68,7 @@ export default function PostPage() {
 
   const handleAddComment = () => {
     if (!user) {
-      toast.error("You must be logged in to comment to a post");
+      toast.error("You must be logged in to comment on a post");
       return;
     }
     commentMutation.mutate();
