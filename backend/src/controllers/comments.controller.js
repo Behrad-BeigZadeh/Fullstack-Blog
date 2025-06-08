@@ -24,7 +24,6 @@ export const createComment = async (req, res) => {
 
     res.status(201).json(comment);
   } catch (error) {
-    console.log("error in createComment controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -48,7 +47,6 @@ export const getCommentsByPostId = async (req, res) => {
 
     res.status(200).json(comments);
   } catch (error) {
-    console.log("error in getCommentsByPostId controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -78,7 +76,6 @@ export const deleteComment = async (req, res) => {
 
     res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
-    console.log("error in deleteComment controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };

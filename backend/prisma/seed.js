@@ -9,8 +9,6 @@ function generateSlug(title) {
 }
 
 async function main() {
-  console.log("⏳ Seeding database...");
-
   await prisma.reaction.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.post.deleteMany();

@@ -6,6 +6,7 @@ import { aj } from "./src/lib/arcjet.js";
 import prisma from "./src/lib/prisma.js";
 import postsRouter from "./src/routes/posts.route.js";
 import usersRouter from "./src/routes/users.route.js";
+import logger from "./src/lib/logger.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 5001;
@@ -55,20 +56,19 @@ app.use(async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log("Arcjet error", error);
     next(error);
   }
 });
 
 app.listen(PORT, () => {
-  console.log("Server is running on PORT:" + PORT);
+  logger.info(`Server is running on PORT: ${PORT}`);
 
   prisma
     .$connect()
     .then(() => {
-      console.log("Connected to database successfully");
+      logger.info("Connected to database successfully");
     })
     .catch((error) => {
-      console.error("Error connecting to the database", error);
+      logger.error("Error connecting to the database", error);
     });
 });

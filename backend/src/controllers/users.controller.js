@@ -45,7 +45,6 @@ export const refreshAccessToken = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error in refreshAccessToken:", error);
     return res
       .status(403)
       .json({ message: "Invalid or expired refresh token" });
@@ -109,7 +108,6 @@ export const signup = async (req, res) => {
         },
       });
   } catch (error) {
-    console.log("error in signup controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -158,7 +156,6 @@ export const login = async (req, res) => {
         },
       });
   } catch (error) {
-    console.log("error in login controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -175,7 +172,9 @@ export const logout = async (req, res) => {
           data: { refreshToken: null },
         });
       } catch (err) {
-        console.log("Invalid refresh token during logout");
+        logger.warn("Invalid refresh token during logout", {
+          error: err.message,
+        });
       }
     }
 
@@ -187,7 +186,6 @@ export const logout = async (req, res) => {
 
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
-    console.log("error in logout controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };

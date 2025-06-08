@@ -40,7 +40,6 @@ async function uploadImages() {
         folder: "blog-posts",
       });
 
-      console.log("✅ Uploaded:", result.secure_url);
       uploadedUrls.push(result.secure_url);
     } catch (err) {
       console.error("❌ Failed to upload image:", url, err.message);
@@ -48,7 +47,6 @@ async function uploadImages() {
   }
 
   console.log("\n🏁 All uploads finished!");
-  console.log("\nUploaded URLs:\n", uploadedUrls);
 }
 
 uploadImages();

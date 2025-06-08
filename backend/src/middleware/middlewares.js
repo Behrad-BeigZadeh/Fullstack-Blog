@@ -23,7 +23,6 @@ export const verifyAccessToken = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    console.log("error in verifyAccessToken middleware", err);
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };

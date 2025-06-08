@@ -18,7 +18,6 @@ export const getPosts = async (req, res) => {
 
     res.status(200).json(posts);
   } catch (error) {
-    console.log("error in getPosts controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -96,7 +95,6 @@ export const getPostById = async (req, res) => {
 
     res.status(200).json({ ...post, userReaction });
   } catch (error) {
-    console.log("error in getPostById controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -143,7 +141,6 @@ export const createPost = async (req, res) => {
 
     res.status(201).json(newPost);
   } catch (error) {
-    console.log("error in createPost controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -319,7 +316,6 @@ export const leaveComment = async (req, res) => {
 
     res.status(201).json("Comment added successfully");
   } catch (error) {
-    console.log("error in leaveComment controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -343,7 +339,6 @@ export const getComments = async (req, res) => {
 
     res.status(200).json(comments);
   } catch (error) {
-    console.log("error in getComments controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
@@ -364,7 +359,6 @@ export const getUserPosts = async (req, res) => {
     });
     return res.status(200).json(posts);
   } catch (error) {
-    console.log("error in getUserPosts controller", error);
     res.status(500).json({ message: "Something went wrong" });
   }
 };
