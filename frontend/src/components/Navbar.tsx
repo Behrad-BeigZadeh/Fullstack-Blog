@@ -1,7 +1,7 @@
 "use client";
 import { logoutUser } from "@/apis/api";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
@@ -14,6 +14,7 @@ export const Navbar = () => {
   const { user, logout } = useAuthStore();
   const isAuthPage = pathname.startsWith("/auth");
   const isCreatePage = pathname.startsWith("/posts/create");
+  const router = useRouter();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -21,6 +22,7 @@ export const Navbar = () => {
     mutationFn: () => logoutUser(),
     onSuccess: () => {
       toast.success("Logged out successfully!");
+      router.replace("/");
     },
   });
 

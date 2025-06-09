@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import axios from "axios";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { logoutUser } from "@/apis/api";
 
 export const useAuthInitializer = () => {
   const { setAccessToken, setUser, logout } = useAuthStore();
@@ -19,8 +20,17 @@ export const useAuthInitializer = () => {
 
         console.log(" Session restored from refresh token");
       } catch (err) {
-        logout();
-        console.log(" No valid session", err);
+        if (axios.isAxiosError(err)) {
+          if (err.response?.status === 403) {
+            await logoutUser();
+
+            logout();
+          } else {
+            console.warn(
+              "Server issue or network error, not logging out immediately."
+            );
+          }
+        }
       }
     };
 
