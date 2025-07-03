@@ -1,5 +1,6 @@
-import { logoutUser } from "@/apis/api";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { handleLogout } from "@/apis/api";
+import { useAuthTokenStore } from "@/stores/tokenStore";
+import { useUserStore } from "@/stores/userStore";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
@@ -9,10 +10,12 @@ const api = axios.create({
 });
 
 let isRefreshing = false;
+let refreshPromise: Promise<string> | null = null;
 
 api.interceptors.request.use(async (config) => {
-  const { accessToken, setAccessToken, setUser, logout } =
-    useAuthStore.getState();
+  const { setUser, logoutUser } = useUserStore.getState();
+  const { accessToken, setAccessToken, logoutToken } =
+    useAuthTokenStore.getState();
 
   if (!accessToken) return config;
 
@@ -20,41 +23,42 @@ api.interceptors.request.use(async (config) => {
     const { exp } = jwtDecode<{ exp: number }>(accessToken);
     const now = Date.now() / 1000;
 
-    if (exp - now < 60 && !isRefreshing) {
-      isRefreshing = true;
-
-      try {
-        const { data } = await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/refresh-token`,
-          {},
-          { withCredentials: true }
-        );
-
-        setAccessToken(data.accessToken);
-        setUser(data.user);
-        config.headers.Authorization = `Bearer ${data.data.accessToken}`;
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          if (err.response?.status === 403) {
-            await logoutUser();
-
-            logout();
-          } else {
-            console.warn(
-              "Server issue or network error, not logging out immediately."
-            );
-          }
-        }
-      } finally {
-        isRefreshing = false;
+    if (exp - now < 60) {
+      if (!isRefreshing) {
+        isRefreshing = true;
+        refreshPromise = axios
+          .post(
+            `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/refresh-token`,
+            {},
+            { withCredentials: true }
+          )
+          .then(({ data }) => {
+            setAccessToken(data.accessToken);
+            setUser(data.user);
+            return data.accessToken;
+          })
+          .catch(async (err) => {
+            if (axios.isAxiosError(err) && err.response?.status === 401) {
+              await handleLogout();
+              logoutUser();
+              logoutToken();
+            }
+            throw err;
+          })
+          .finally(() => {
+            isRefreshing = false;
+            refreshPromise = null;
+          });
       }
+
+      const newAccessToken = await refreshPromise;
+      config.headers.Authorization = `Bearer ${newAccessToken}`;
     } else {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
     return config;
-  } catch (err) {
-    console.error("Failed to decode token or refresh", err);
+  } catch {
     return config;
   }
 });

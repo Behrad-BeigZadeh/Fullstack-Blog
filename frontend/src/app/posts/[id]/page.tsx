@@ -9,7 +9,7 @@ import Spinner from "@/components/Spinner";
 import { useParams } from "next/navigation";
 import { BiDislike, BiSolidDislike } from "react-icons/bi";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "@/stores/useAuthStore";
+import { getCurrentUser } from "@/stores/userStore";
 import CommentsList from "@/components/commentsList";
 import { useReaction } from "@/hooks/useReaction";
 

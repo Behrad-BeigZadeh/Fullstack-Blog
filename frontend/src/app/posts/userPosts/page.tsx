@@ -9,10 +9,16 @@ import { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { AxiosError } from "axios";
 import { FaEdit } from "react-icons/fa";
+import { useAuthTokenStore } from "@/stores/tokenStore";
+import { useUserStore } from "@/stores/userStore";
+import { useRouter } from "next/navigation";
 
 export default function UserPosts() {
   const [showModal, setShowModal] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const { accessToken } = useAuthTokenStore();
+  const { user } = useUserStore();
+  const router = useRouter();
 
   const {
     data: posts,
@@ -22,6 +28,7 @@ export default function UserPosts() {
   } = useQuery({
     queryKey: ["userPosts"],
     queryFn: getUserPosts,
+    enabled: !!accessToken && !!user,
   });
 
   const queryClient = useQueryClient();
@@ -76,9 +83,9 @@ export default function UserPosts() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts?.map((post: Post) => (
-              <Link
+              <div
                 key={post.id}
-                href={`/posts/${post.id}`}
+                onClick={() => router.push(`/posts/${post.id}`)}
                 className="bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow hover:shadow-lg transition hover:scale-105"
               >
                 <img
@@ -121,7 +128,7 @@ export default function UserPosts() {
                     </div>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>

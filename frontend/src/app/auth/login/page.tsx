@@ -5,14 +5,16 @@ import { login } from "@/apis/api";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { AxiosError } from "axios";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useUserStore } from "@/stores/userStore";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { useAuthTokenStore } from "@/stores/tokenStore";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
-  const { setUser, setAccessToken } = useAuthStore();
+  const { setUser } = useUserStore();
+  const { setAccessToken } = useAuthTokenStore();
   const [formData, setFormData] = useState({
     email: "",
     password: "",

@@ -1,5 +1,5 @@
 import api from "@/lib/axios";
-import { getCurrentUser } from "@/stores/useAuthStore";
+import { getCurrentUser } from "@/stores/userStore";
 
 // Get All posts
 export const getPosts = async () => {
@@ -175,7 +175,7 @@ export const login = async (email: string, password: string) => {
   }
 };
 
-export const logoutUser = async () => {
+export const handleLogout = async () => {
   try {
     await api.post("/api/auth/logout", {});
   } catch (error) {

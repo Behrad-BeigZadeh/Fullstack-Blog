@@ -1,6 +1,7 @@
 "use client";
 import { signup } from "@/apis/api";
-import { useAuthStore } from "@/stores/useAuthStore";
+import { useAuthTokenStore } from "@/stores/tokenStore";
+import { useUserStore } from "@/stores/userStore";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { Eye, EyeOff } from "lucide-react";
@@ -12,7 +13,8 @@ import toast from "react-hot-toast";
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { setUser, setAccessToken } = useAuthStore();
+  const { setUser } = useUserStore();
+  const { setAccessToken } = useAuthTokenStore();
   const [formData, setFormData] = useState({
     username: "",
     email: "",

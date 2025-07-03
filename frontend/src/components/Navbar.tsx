@@ -1,17 +1,20 @@
 "use client";
-import { logoutUser } from "@/apis/api";
+import { handleLogout } from "@/apis/api";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useAuthStore } from "@/stores/useAuthStore";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
+import { useUserStore } from "@/stores/userStore";
+import Spinner from "./Spinner";
+import { useAuthTokenStore } from "@/stores/tokenStore";
 
 export const Navbar = () => {
   const pathname = usePathname();
-  const { user, logout } = useAuthStore();
+  const { user, logoutUser, hasHydrated } = useUserStore();
+  const { logoutToken } = useAuthTokenStore();
   const isAuthPage = pathname.startsWith("/auth");
   const isCreatePage = pathname.startsWith("/posts/create");
   const router = useRouter();
@@ -19,7 +22,7 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const logoutMutation = useMutation({
-    mutationFn: () => logoutUser(),
+    mutationFn: () => handleLogout(),
     onSuccess: () => {
       toast.success("Logged out successfully!");
       router.replace("/");
@@ -33,15 +36,18 @@ export const Navbar = () => {
     }
   }, [logoutMutation.isError, logoutMutation.error]);
 
-  const handleLogout = () => {
+  const handleLogoutUser = () => {
     logoutMutation.mutate();
-    logout();
+    logoutUser();
+    logoutToken();
     setIsMobileMenuOpen(false);
   };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
+
+  if (!hasHydrated) return <Spinner />;
 
   return (
     <nav
@@ -67,7 +73,7 @@ export const Navbar = () => {
         </Link>
         {user ? (
           <button
-            onClick={handleLogout}
+            onClick={handleLogoutUser}
             className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl transition"
           >
             Logout
@@ -119,7 +125,7 @@ export const Navbar = () => {
           </Link>
           {user ? (
             <button
-              onClick={handleLogout}
+              onClick={handleLogoutUser}
               className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl transition"
             >
               Logout

@@ -1,10 +1,12 @@
 import { useEffect } from "react";
 import axios from "axios";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { logoutUser } from "@/apis/api";
+import { useAuthTokenStore } from "@/stores/tokenStore";
+import { useUserStore } from "@/stores/userStore";
+import { handleLogout } from "@/apis/api";
 
 export const useAuthInitializer = () => {
-  const { setAccessToken, setUser, logout } = useAuthStore();
+  const { setUser, logoutUser, setHasHydrated } = useUserStore();
+  const { setAccessToken, logoutToken } = useAuthTokenStore();
 
   useEffect(() => {
     const tryRefresh = async () => {
@@ -17,20 +19,14 @@ export const useAuthInitializer = () => {
 
         setAccessToken(data.accessToken);
         setUser(data.user);
-
-        console.log(" Session restored from refresh token");
       } catch (err) {
-        if (axios.isAxiosError(err)) {
-          if (err.response?.status === 403) {
-            await logoutUser();
-
-            logout();
-          } else {
-            console.warn(
-              "Server issue or network error, not logging out immediately."
-            );
-          }
+        if (axios.isAxiosError(err) && err.response?.status === 401) {
+          await handleLogout();
+          logoutUser();
+          logoutToken();
         }
+      } finally {
+        setHasHydrated(true);
       }
     };
 
