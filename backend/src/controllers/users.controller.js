@@ -20,23 +20,40 @@ const createRefreshToken = (user) => {
 export const refreshAccessToken = async (req, res) => {
   try {
     const token = req.cookies.refreshToken;
+    console.log("Received refresh token:", token);
 
     if (!token) {
       return res.status(401).json({ message: "Refresh token not found" });
     }
 
-    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+      console.log("Decoded:", decoded);
+    } catch (err) {
+      return res
+        .status(403)
+        .json({ message: "Invalid or expired refresh token" });
+    }
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
     });
+    console.log("User.refreshToken:", user.refreshToken);
 
-    if (!user || user.refreshToken !== token) {
+    if (!user || !user.refreshToken) {
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+    console.log("Comparison:", await bcrypt.compare(token, user.refreshToken));
+
+    const isValid = await bcrypt.compare(token, user.refreshToken);
+    if (!isValid) {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
 
     const newAccessToken = createAccessToken(user);
     const newRefreshToken = createRefreshToken(user);
+    const newHashedToken = await bcrypt.hash(newRefreshToken, 10);
 
     await prisma.user.update({
       where: { id: user.id },
@@ -45,11 +62,11 @@ export const refreshAccessToken = async (req, res) => {
 
     res.cookie("refreshToken", newRefreshToken, {
       httpOnly: true,
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
+    console.log("New refresh token set in cookie");
     res.status(200).json({
       accessToken: newAccessToken,
       user: {
@@ -59,6 +76,7 @@ export const refreshAccessToken = async (req, res) => {
       },
     });
   } catch (error) {
+    console.log("Error in refreshAccessToken:", error);
     return res
       .status(403)
       .json({ message: "Invalid or expired refresh token" });
@@ -72,11 +90,9 @@ export const signup = async (req, res) => {
     if (!email || !username || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
 
-    if (user) {
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
@@ -84,9 +100,7 @@ export const signup = async (req, res) => {
       where: { username },
     });
     if (existingUsername) {
-      return res
-        .status(400)
-        .json({ message: "Username already exists select something else" });
+      return res.status(400).json({ message: "Username already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -100,31 +114,33 @@ export const signup = async (req, res) => {
 
     const accessToken = createAccessToken(newUser);
     const refreshToken = createRefreshToken(newUser);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
     await prisma.user.update({
-      where: { id: newUser.id },
-      data: { refreshToken },
+      where: { id: newUser.id }, // 🔥 was incorrectly using `user.id`
+      data: { refreshToken: hashedRefreshToken },
     });
-    res
-      .cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      })
-      .status(200)
-      .json({
-        accessToken,
-        user: {
-          id: newUser.id,
-          username: newUser.username,
-          email: newUser.email,
-        },
-      });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      accessToken,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
 };
+
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -136,6 +152,7 @@ export const login = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { email },
     });
+
     if (!user) {
       return res.status(400).json({ message: "User does not exist" });
     }
@@ -147,28 +164,28 @@ export const login = async (req, res) => {
 
     const accessToken = createAccessToken(user);
     const refreshToken = createRefreshToken(user);
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { refreshToken },
+      data: { refreshToken: hashedRefreshToken },
     });
 
-    res
-      .cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      })
-      .status(200)
-      .json({
-        accessToken,
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-        },
-      });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      accessToken,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
   }
@@ -195,9 +212,9 @@ export const logout = async (req, res) => {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     res.status(500).json({ message: "Something went wrong" });
