@@ -36,6 +36,19 @@ export const refreshAccessToken = async (req, res) => {
     }
 
     const newAccessToken = createAccessToken(user);
+    const newRefreshToken = createRefreshToken(user);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { refreshToken: newHashedToken },
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
 
     res.status(200).json({
       accessToken: newAccessToken,
