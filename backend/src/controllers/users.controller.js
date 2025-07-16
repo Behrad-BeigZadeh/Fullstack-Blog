@@ -20,7 +20,6 @@ const createRefreshToken = (user) => {
 export const refreshAccessToken = async (req, res) => {
   try {
     const token = req.cookies.refreshToken;
-    console.log("Received refresh token:", token);
 
     if (!token) {
       return res.status(401).json({ message: "Refresh token not found" });
@@ -29,7 +28,6 @@ export const refreshAccessToken = async (req, res) => {
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-      console.log("Decoded:", decoded);
     } catch (err) {
       return res
         .status(403)
@@ -39,12 +37,10 @@ export const refreshAccessToken = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
     });
-    console.log("User.refreshToken:", user.refreshToken);
 
     if (!user || !user.refreshToken) {
       return res.status(403).json({ message: "Invalid refresh token" });
     }
-    console.log("Comparison:", await bcrypt.compare(token, user.refreshToken));
 
     const isValid = await bcrypt.compare(token, user.refreshToken);
     if (!isValid) {
@@ -66,7 +62,6 @@ export const refreshAccessToken = async (req, res) => {
       secure: process.env.NODE_ENV === "production",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    console.log("New refresh token set in cookie");
     res.status(200).json({
       accessToken: newAccessToken,
       user: {
@@ -76,7 +71,6 @@ export const refreshAccessToken = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("Error in refreshAccessToken:", error);
     return res
       .status(403)
       .json({ message: "Invalid or expired refresh token" });
